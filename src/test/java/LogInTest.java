@@ -37,23 +37,25 @@ public class LogInTest {
 
     @Before
     public void startUp() {
+        String yandexDriverPath = System.getProperty("yandexDriverPath", "src/main/resources/yandexdriver.exe");
+        String chromeDriverPath = System.getProperty("chromeDriverPath", "src/main/resources/chromedriver.exe");
+
+        if (checkNeedSetYandexDriver) {
+            System.setProperty("webdriver.chrome.driver", yandexDriverPath);
+        } else {
+            System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+        }
+
+        driver = new ChromeDriver();
+        userClient = new UserClient();
+        page = new MainPage(driver);
+
         name = RandomStringUtils.randomAlphabetic(count);
         email = RandomStringUtils.randomAlphabetic(count) + "@mail.ru";
         password = RandomStringUtils.randomAlphabetic(count);
         user = new User(email, password, name);
-        userClient = new UserClient();
         ValidatableResponse responseCreate = userClient.createUser(user);
         accessToken = responseCreate.extract().path("accessToken");
-        if (checkNeedSetYandexDriver) {
-            System.setProperty("webdriver.chrome.driver",
-                    "C:\\Users\\Olya\\Diplom\\Diplom_3\\src\\main\\resources\\yandexdriver.exe");
-        }
-
-        System.setProperty("webdriver.chrome.driver",
-                "C:\\Users\\Olya\\Diplom\\Diplom_3\\src\\main\\resources\\chromedriver.exe");
-
-        driver = new ChromeDriver();
-        page = new MainPage(driver);
     }
 
     @Test
@@ -116,10 +118,9 @@ public class LogInTest {
 
     @After
     public void teardown() {
-        //Удаление user
         userClient.deleteUser(accessToken);
-        // Закрытие браузера
         driver.quit();
     }
 }
+
 

@@ -39,17 +39,19 @@ public class RegistrationTest {
 
     @Before
     public void startUp() {
-        if (checkNeedSetYandexDriver) {
-            System.setProperty("webdriver.chrome.driver",
-                    "C:\\Users\\Olya\\Diplom\\Diplom_3\\src\\main\\resources\\yandexdriver.exe");
-        }
+        String yandexDriverPath = System.getProperty("yandexDriverPath", "src/main/resources/yandexdriver.exe");
+        String chromeDriverPath = System.getProperty("chromeDriverPath", "src/main/resources/chromedriver.exe");
 
-        System.setProperty("webdriver.chrome.driver",
-                "C:\\Users\\Olya\\Diplom\\Diplom_3\\src\\main\\resources\\chromedriver.exe");
+        if (checkNeedSetYandexDriver) {
+            System.setProperty("webdriver.chrome.driver", yandexDriverPath);
+        } else {
+            System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+        }
 
         driver = new ChromeDriver();
         userClient = new UserClient();
         page = new MainPage(driver);
+
         name = RandomStringUtils.randomAlphabetic(count);
         email = RandomStringUtils.randomAlphabetic(count) + "@mail.ru";
         password = RandomStringUtils.randomAlphabetic(count);
@@ -93,16 +95,13 @@ public class RegistrationTest {
 
     @After
     public void teardown() {
-        //получения токена для удаления на главной странице после логина
         page.open()
                 .clickPersonalAccountButton()
                 .logInUser(email, password);
-        //Получение токена для удаления созданного пользователя
         WebStorage webStorage = (WebStorage) new Augmenter().augment(driver);
         LocalStorage localStorage = webStorage.getLocalStorage();
         String accessToken = localStorage.getItem("accessToken");
         userClient.deleteUser(accessToken);
-        // Закрытие браузера
         driver.quit();
     }
 }

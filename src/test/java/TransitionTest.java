@@ -12,7 +12,6 @@ import static org.junit.Assert.assertTrue;
 public class TransitionTest {
     private WebDriver driver;
     private MainPage page;
-    private int count = 10;
     private boolean checkNeedSetYandexDriver;
 
     public TransitionTest(boolean checkNeedSetYandexDriver) {
@@ -29,13 +28,14 @@ public class TransitionTest {
 
     @Before
     public void startUp() {
-        if (checkNeedSetYandexDriver) {
-            System.setProperty("webdriver.chrome.driver",
-                    "C:\\Users\\Olya\\Diplom\\Diplom_3\\src\\main\\resources\\yandexdriver.exe");
-        }
+        String yandexDriverPath = System.getProperty("yandexDriverPath", "src/main/resources/yandexdriver.exe");
+        String chromeDriverPath = System.getProperty("chromeDriverPath", "src/main/resources/chromedriver.exe");
 
-        System.setProperty("webdriver.chrome.driver",
-                "C:\\Users\\Olya\\Diplom\\Diplom_3\\src\\main\\resources\\chromedriver.exe");
+        if (checkNeedSetYandexDriver) {
+            System.setProperty("webdriver.chrome.driver", yandexDriverPath);
+        } else {
+            System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+        }
 
         driver = new ChromeDriver();
         page = new MainPage(driver);
@@ -99,7 +99,6 @@ public class TransitionTest {
 
     @After
     public void teardown() {
-        // Закрытие браузера
         driver.quit();
     }
 }
